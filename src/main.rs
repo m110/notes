@@ -1,6 +1,11 @@
+extern crate rusqlite;
+mod storage;
+
 use std::io;
 use std::io::prelude::*;
 use std::collections::HashMap;
+
+use storage::Storage;
 
 enum Action {
     Output(String),
@@ -10,7 +15,7 @@ enum Action {
 
 type Commands = HashMap<String, fn() -> Action>;
 
-const _DB_PATH: &'static str = "~/.notes.db";
+const DB_PATH: &'static str = "~/.notes.db";
 
 fn ls() -> Action {
     let result = "placeholder".to_string();
@@ -68,6 +73,7 @@ fn command_loop(commands: &Commands) {
 
 fn main() {
     let mut commands: Commands = HashMap::new();
+    let storage = Storage::new(DB_PATH.to_string()).unwrap();
 
     commands.insert("ls".to_string(), ls);
     commands.insert("add".to_string(), add);
