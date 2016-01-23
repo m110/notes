@@ -1,4 +1,7 @@
+extern crate rand;
+
 mod commands;
+mod editor;
 mod storage;
 
 use std::io;

@@ -1,4 +1,5 @@
 use storage::Storage;
+use editor::text_from_editor;
 
 pub enum Action {
     Output(String),
@@ -12,8 +13,7 @@ pub fn ls(storage: &mut Storage) -> Action {
 }
 
 pub fn add(storage: &mut Storage) -> Action {
-    let entry = "Placeholder entry\n".to_string();
-    storage.add_entry(entry);
+    storage.add_entry(text_from_editor());
 
     Action::Output("Entry added".to_string())
 }
