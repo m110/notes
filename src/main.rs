@@ -1,4 +1,4 @@
-extern crate rusqlite;
+mod commands;
 mod storage;
 
 use std::io;
@@ -6,40 +6,23 @@ use std::io::prelude::*;
 use std::collections::HashMap;
 
 use storage::Storage;
+use commands::Action;
+use commands::{add,ls,exit};
 
-enum Action {
-    Output(String),
-    Exit,
-    None,
-}
+type Commands = HashMap<String, fn(storage: &mut Storage) -> Action>;
 
-type Commands = HashMap<String, fn() -> Action>;
+const DB_PATH: &'static str = "~/.notes";
 
-const DB_PATH: &'static str = "~/.notes.db";
-
-fn ls() -> Action {
-    let result = "placeholder".to_string();
-    Action::Output(result)
-}
-
-fn add() -> Action {
-    Action::None
-}
-
-fn exit() -> Action {
-    Action::Exit
-}
-
-fn process_command(commands: &Commands, command: String) -> Action {
+fn process_command(commands: &Commands, storage: &mut Storage, command: String) -> Action {
     match commands.get(&command) {
         None => { return Action::Output("No such command!".to_string()) },
         Some(method) => {
-            return method();
+            return method(storage);
         },
     };
 }
 
-fn command_loop(commands: &Commands) {
+fn command_loop(commands: &Commands, storage: &mut Storage) {
     loop {
         print!("notes> ");
         io::stdout().flush().expect("Flush failed");
@@ -59,7 +42,7 @@ fn command_loop(commands: &Commands) {
                     continue;
                 }
 
-                match process_command(commands, input) {
+                match process_command(commands, storage, input) {
                     Action::Output(output) => println!("{}", output),
                     Action::Exit => break,
                     Action::None => (),
@@ -73,12 +56,12 @@ fn command_loop(commands: &Commands) {
 
 fn main() {
     let mut commands: Commands = HashMap::new();
-    let storage = Storage::new(DB_PATH.to_string()).unwrap();
+    let mut storage = Storage::new(DB_PATH.to_string()).unwrap();
 
     commands.insert("ls".to_string(), ls);
     commands.insert("add".to_string(), add);
     commands.insert("exit".to_string(), exit);
     commands.insert("quit".to_string(), exit);
 
-    command_loop(&commands);
+    command_loop(&commands, &mut storage);
 }

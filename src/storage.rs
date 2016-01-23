@@ -1,19 +1,46 @@
-use rusqlite::Connection;
-
 use std::env;
+use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::io::SeekFrom;
 
 pub struct Storage {
-    connection: Connection,
+    file: File,
 }
 
 impl Storage {
-    pub fn new(db_path: String) -> Result<Storage, String> {
-        let db_path = expand_home_dir(db_path);
+    pub fn new(path: String) -> Result<Storage, String> {
+        let path = expand_home_dir(path);
 
-        match Connection::open(db_path) {
-            Ok(connection) => Ok(Storage { connection: connection}),
-            Err(_) => Err("SQLite connection failed".to_string()),
+        let file = OpenOptions::new()
+                    .read(true)
+                    .write(true)
+                    .append(true)
+                    .create(true)
+                    .open(path);
+
+        match file {
+            Ok(file) => Ok(Storage { file: file }),
+            Err(_) => Err("Open failed".to_string()),
         }
+    }
+
+    pub fn entries(&mut self) -> Vec<String> {
+        self.file.seek(SeekFrom::Start(0)).unwrap();
+
+        let mut result = vec![];
+        let reader = BufReader::new(&self.file);
+
+        for line in reader.lines() {
+            result.push(line.unwrap());
+        }
+
+        return result;
+    }
+
+    pub fn add_entry(&mut self, content: String) {
+        self.file.write_all(content.as_bytes()).unwrap();
     }
 }
 
