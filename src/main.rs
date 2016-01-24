@@ -1,4 +1,5 @@
 extern crate rand;
+extern crate time;
 
 mod commands;
 mod editor;
