@@ -1,13 +1,17 @@
 use rand;
 use rand::Rng;
 use std::process::Command;
+use std::io::prelude::*;
+use std::fs::File;
 
 const TEMP_FILE_LENGTH: usize = 16;
 
 pub fn text_from_editor() -> String {
+    let temp_file = temp_file();
+
     let status = Command::new(editor())
-                        .arg(temp_file())
-                        .status();
+                         .arg(temp_file.clone())
+                         .status();
 
     match status {
         Ok(status) => {
@@ -15,10 +19,14 @@ pub fn text_from_editor() -> String {
                 return String::new();
             }
 
-            // TODO Return file's content
-            return String::new();
+            let mut file = File::open(temp_file).unwrap();
+            let mut buffer = String::new();
+
+            file.read_to_string(&mut buffer).unwrap();
+
+            buffer
         },
-        Err(_) => return String::new(),
+        Err(_) => String::new()
     }
 }
 
