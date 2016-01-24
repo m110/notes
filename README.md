@@ -17,3 +17,9 @@ Also, it's a way to improve my Rust skills.
 
 * Data probably kept in text file.
 * More interfaces, perhaps NCurses or web.
+* Notes stored in "books" that can be one of:
+    * Journal - dated entries
+    * Notepad - wiki-like structured notes
+    * Scratchpad - just one big entry
+    * ...more? (To-Dos, some-sort-of-brain-dump-thing, ...?)
+* Basic navigation similar to linux shell.
