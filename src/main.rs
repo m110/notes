@@ -3,6 +3,7 @@ extern crate time;
 
 mod commands;
 mod editor;
+mod models;
 mod storage;
 
 use std::io;
