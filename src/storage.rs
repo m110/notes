@@ -4,6 +4,9 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::SeekFrom;
+use regex::Regex;
+
+use models::{Book, Entry};
 
 pub struct Storage {
     file: File,
@@ -26,17 +29,10 @@ impl Storage {
         }
     }
 
-    pub fn entries(&mut self) -> Vec<String> {
-        self.file.seek(SeekFrom::Start(0)).unwrap();
-
-        let mut result = vec![];
-        let reader = BufReader::new(&self.file);
-
-        for line in reader.lines() {
-            result.push(line.unwrap());
-        }
-
-        return result;
+    pub fn books(&mut self) -> Vec<Book> {
+        let mut reader = Reader::new();
+        reader.read(&mut self.file);
+        reader.books()
     }
 
     pub fn add_entry(&mut self, content: String) {
@@ -48,5 +44,90 @@ fn expand_home_dir(path: String) -> String {
     match env::home_dir() {
         Some(home_dir) => path.replace("~", home_dir.to_str().unwrap()),
         None => path,
+    }
+}
+
+struct Reader {
+    current_book: Option<Book>,
+    current_entry: Option<Entry>,
+    content: String,
+    books: Vec<Book>,
+}
+
+impl Reader {
+    pub fn new() -> Reader {
+        Reader {
+            current_book: None,
+            current_entry: None,
+            content: String::new(),
+            books: Vec::<Book>::new(),
+        }
+    }
+
+    pub fn read(&mut self, file: &mut File) {
+        file.seek(SeekFrom::Start(0)).unwrap();
+
+        let reader = BufReader::new(file);
+
+        let book_regex = Regex::new("^== (.+) == (.+) ==$").unwrap();
+        let entry_regex = Regex::new("^== (.+) ==$").unwrap();
+
+        for line in reader.lines() {
+            let line = line.unwrap();
+
+            match book_regex.captures(&line) {
+                Some(caps) => {
+                    self.end_book();
+                    self.current_book = Some(Book::new());
+                    continue;
+                },
+                None => {},
+            }
+
+            match entry_regex.captures(&line) {
+                Some(caps) => {
+                    self.end_entry();
+                    self.content.clear();
+                    self.current_entry = Some(Entry::new());
+                    continue;
+                },
+                None => {},
+            }
+
+            self.content.push_str(&line);
+            self.content.push('\n');
+        }
+
+        self.end_book();
+    }
+
+    fn end_book(&mut self) {
+        self.end_entry();
+        match self.current_book.take() {
+            Some(book) => {
+                self.books.push(book);
+            },
+            None => {},
+        }
+    }
+
+    fn end_entry(&mut self) {
+        match self.current_entry.take() {
+            Some(mut entry) => {
+                entry.set_content(&self.content);
+
+                match self.current_book.as_mut() {
+                    Some(book) => {
+                        book.add_entry(entry);
+                    },
+                    None => panic!("Entry not within a book"),
+                }
+            },
+            None => {},
+        }
+    }
+
+    pub fn books(self) -> Vec<Book> {
+        self.books
     }
 }
