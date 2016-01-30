@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 pub enum BookCategory {
     Journal,
     Notepad,
@@ -10,14 +12,29 @@ pub struct Entry {
 }
 
 pub struct Book {
+    title: String,
     category: BookCategory,
     entries: Vec<Entry>,
 }
 
+impl FromStr for BookCategory {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<BookCategory, ()> {
+        match s {
+            "journal" => Ok(BookCategory::Journal),
+            "notepad" => Ok(BookCategory::Notepad),
+            "scratchpad" => Ok(BookCategory::Scratchpad),
+            _ => Err(()),
+        }
+    }
+}
+
 impl Book {
-    pub fn new() -> Book {
+    pub fn new(title: &str, category: &str) -> Book {
         Book {
-            category: BookCategory::Journal,
+            title: String::from(title),
+            category: category.parse::<BookCategory>().unwrap(),
             entries: vec![],
         }
     }

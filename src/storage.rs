@@ -78,7 +78,11 @@ impl Reader {
             match book_regex.captures(&line) {
                 Some(caps) => {
                     self.end_book();
-                    self.current_book = Some(Book::new());
+
+                    let title = caps.at(1).unwrap_or("unknown");
+                    let category = caps.at(2).unwrap_or("unknown");
+                    self.current_book = Some(Book::new(title, category));
+
                     continue;
                 },
                 None => {},
