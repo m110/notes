@@ -10,6 +10,7 @@ use models::{Book, Entry};
 
 pub struct Storage {
     file: File,
+    books: Vec<Book>,
 }
 
 impl Storage {
@@ -24,15 +25,18 @@ impl Storage {
                     .open(path);
 
         match file {
-            Ok(file) => Ok(Storage { file: file }),
+            Ok(file) => Ok(Storage { file: file, books: vec![] }),
             Err(_) => Err("Open failed".to_string()),
         }
     }
 
-    pub fn books(&mut self) -> Vec<Book> {
+    pub fn load(&mut self) {
         let mut reader = Reader::new();
-        reader.read(&mut self.file);
-        reader.books()
+        self.books = reader.read(&mut self.file);
+    }
+
+    pub fn books(&self) -> Vec<String> {
+        self.books.iter().map(|ref x| x.title()).collect()
     }
 
     pub fn add_entry(&mut self, content: String) {
@@ -64,7 +68,7 @@ impl Reader {
         }
     }
 
-    pub fn read(&mut self, file: &mut File) {
+    pub fn read(&mut self, file: &mut File) -> Vec<Book> {
         file.seek(SeekFrom::Start(0)).unwrap();
 
         let reader = BufReader::new(file);
@@ -103,6 +107,8 @@ impl Reader {
         }
 
         self.end_book();
+
+        self.books.drain(..).collect()
     }
 
     fn end_book(&mut self) {
@@ -129,9 +135,5 @@ impl Reader {
             },
             None => {},
         }
-    }
-
-    pub fn books(self) -> Vec<Book> {
-        self.books
     }
 }

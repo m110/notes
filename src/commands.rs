@@ -11,14 +11,13 @@ pub enum Action {
 }
 
 pub fn ls(storage: &mut Storage) -> Action {
-    let mut result = String::new();
-
-    for book in storage.books() {
+    /*for book in storage.books() {
         for entry in book.entries() {
             result.push_str(&entry.content());
         }
-    }
+    }*/
 
+    let result = storage.books().join("\n");
     Action::Output(result)
 }
 

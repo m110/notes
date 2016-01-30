@@ -63,6 +63,7 @@ fn command_loop(commands: &Commands, storage: &mut Storage) {
 fn main() {
     let mut commands: Commands = HashMap::new();
     let mut storage = Storage::new(DB_PATH.to_string()).unwrap();
+    storage.load();
 
     commands.insert("ls".to_string(), ls);
     commands.insert("add".to_string(), add);

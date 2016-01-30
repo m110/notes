@@ -34,7 +34,7 @@ impl Book {
     pub fn new(title: &str, category: &str) -> Book {
         Book {
             title: String::from(title),
-            category: category.parse::<BookCategory>().unwrap(),
+            category: category.parse::<BookCategory>().expect("Unknown book category"),
             entries: vec![],
         }
     }
@@ -45,6 +45,10 @@ impl Book {
 
     pub fn entries(self) -> Vec<Entry> {
         self.entries
+    }
+
+    pub fn title(&self) -> String {
+        self.title.clone()
     }
 }
 
