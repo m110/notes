@@ -14,7 +14,7 @@ pub struct Storage {
 }
 
 impl Storage {
-    pub fn new(path: String) -> Result<Storage, String> {
+    pub fn new(path: &str) -> Result<Storage, String> {
         let path = expand_home_dir(path);
 
         let file = OpenOptions::new()
@@ -35,8 +35,12 @@ impl Storage {
         self.books = reader.read(&mut self.file);
     }
 
-    pub fn books(&self) -> Vec<String> {
-        self.books.iter().map(|ref x| x.title()).collect()
+    pub fn books(&self) -> &Vec<Book> {
+        &self.books
+    }
+
+    pub fn entries(&self, book_id: usize) -> &Vec<Entry> {
+        &self.books[book_id].entries
     }
 
     pub fn add_entry(&mut self, content: String) {
@@ -44,10 +48,10 @@ impl Storage {
     }
 }
 
-fn expand_home_dir(path: String) -> String {
+fn expand_home_dir(path: &str) -> String {
     match env::home_dir() {
         Some(home_dir) => path.replace("~", home_dir.to_str().unwrap()),
-        None => path,
+        None => path.to_string(),
     }
 }
 

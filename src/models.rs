@@ -7,14 +7,14 @@ pub enum BookCategory {
 }
 
 pub struct Entry {
-    date: String, // TODO Proper date type
-    content: String,
+    pub date: String, // TODO Proper date type
+    pub content: String,
 }
 
 pub struct Book {
-    title: String,
+    pub title: String,
     category: BookCategory,
-    entries: Vec<Entry>,
+    pub entries: Vec<Entry>,
 }
 
 impl FromStr for BookCategory {
@@ -42,14 +42,6 @@ impl Book {
     pub fn add_entry(&mut self, entry: Entry) {
         self.entries.push(entry)
     }
-
-    pub fn entries(self) -> Vec<Entry> {
-        self.entries
-    }
-
-    pub fn title(&self) -> String {
-        self.title.clone()
-    }
 }
 
 impl Entry {
@@ -64,7 +56,7 @@ impl Entry {
         self.content = String::from(content);
     }
 
-    pub fn content(self) -> String {
-        self.content
+    pub fn title(&self) -> &String {
+        &self.content
     }
 }

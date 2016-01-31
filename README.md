@@ -36,7 +36,7 @@ Also, it's a way to improve my Rust skills.
 Books listing:
 
 ```
-notes> ls
+> ls
 my_journal
 random_thoughts
 scratchpad
@@ -45,11 +45,17 @@ scratchpad
 Entries listing:
 
 ```
-notes> ls my_journal
+> my_journal
+my_journal> ls
 Last 5 entries:
 42    Example title       24-01-2016 23:44:41
 41    Lorem Ipsum         22-01-2016 11:23:12
 40    Dolor Sit           10-01-2016 12:32:00
 39    Happy New Year      01-01-2016 00:02:02
 38    Some random entry   01-01-2016 00:01:00
+my_journal> 42
+24-01-2016 23:44:41
+Example title
+
+This is an example entry.
 ```
