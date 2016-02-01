@@ -34,7 +34,12 @@ impl Cli {
 
     pub fn run(&mut self) {
         loop {
-            print!("notes> ");
+            let prompt = match self.current_book {
+                Some(book) => self.storage.books()[book].title.clone(),
+                None => String::new(),
+            };
+
+            print!("{}> ", prompt);
             io::stdout().flush().expect("Flush failed");
 
             let mut input = String::new();
@@ -65,16 +70,20 @@ impl Cli {
     }
 
     fn process_command(&mut self, command: &str) -> Action {
+        // TODO: Split on all whitespace
+        let mut args = command.split(" ").collect::<Vec<_>>();
+        let command = args.remove(0);
+
         match command {
-            "ls" => self.ls(),
-            "add" => self.add(),
-            "exit" => self.exit(),
-            "quit" => self.exit(),
+            "ls" => self.ls(args),
+            "add" => self.add(args),
+            "exit" => self.exit(args),
+            "quit" => self.exit(args),
             _ => Action::Output("No such command!".to_string()),
         }
     }
 
-    fn ls(&mut self) -> Action {
+    fn ls(&mut self, _: Vec<&str>) -> Action {
         let mut result = String::new();
 
         for book in self.storage.books() {
@@ -84,7 +93,7 @@ impl Cli {
         Action::Output(result)
     }
 
-    fn add(&mut self) -> Action {
+    fn add(&mut self, _: Vec<&str>) -> Action {
         let date = match time::strftime(TIME_FORMAT, &time::now()) {
             Ok(date) => date,
             Err(_) => String::from("(unknown)"),
@@ -99,7 +108,7 @@ impl Cli {
         Action::Output("Entry added".to_string())
     }
 
-    fn exit(&mut self) -> Action {
+    fn exit(&mut self, _: Vec<&str>) -> Action {
         Action::Exit
     }
 }
