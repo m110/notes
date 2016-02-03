@@ -43,6 +43,12 @@ impl Storage {
         &self.books[book_id].entries
     }
 
+    // TODO Handle invalid category error
+    pub fn add_book(&mut self, title: &str, category: &str) {
+        let book = Book::new(title, category);
+        self.books.push(book);
+    }
+
     pub fn add_entry(&mut self, content: String) {
         self.file.write_all(content.as_bytes()).unwrap();
     }

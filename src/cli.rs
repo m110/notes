@@ -77,6 +77,7 @@ impl Cli {
         match command {
             "ls" => self.ls(args),
             "add" => self.add(args),
+            "new" => self.new_book(args),
             "exit" => self.exit(args),
             "quit" => self.exit(args),
             _ => Action::Output("No such command!".to_string()),
@@ -88,6 +89,7 @@ impl Cli {
 
         for book in self.storage.books() {
             result.push_str(&book.title);
+            result.push('\n');
         }
 
         Action::Output(result)
@@ -106,6 +108,22 @@ impl Cli {
         self.storage.add_entry(entry);
 
         Action::Output("Entry added".to_string())
+    }
+
+    fn new_book(&mut self, args: Vec<&str>) -> Action {
+        let title = match args.get(0) {
+            Some(arg) => arg,
+            None => return Action::Output("Missing book title".to_string()),
+        };
+
+        let category = match args.get(1) {
+            Some(arg) => arg,
+            None => return Action::Output("Missing book category".to_string()),
+        };
+
+        self.storage.add_book(title, category);
+
+        Action::Output("Book added".to_string())
     }
 
     fn exit(&mut self, _: Vec<&str>) -> Action {
