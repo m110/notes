@@ -1,5 +1,9 @@
 use std::str::FromStr;
 
+const JOURNAL: &'static str = "journal";
+const NOTEPAD: &'static str = "notepad";
+const SCRATCHPAD: &'static str = "scratchpad";
+
 pub enum BookCategory {
     Journal,
     Notepad,
@@ -22,11 +26,22 @@ impl FromStr for BookCategory {
 
     fn from_str(s: &str) -> Result<BookCategory, ()> {
         match s {
-            "journal" => Ok(BookCategory::Journal),
-            "notepad" => Ok(BookCategory::Notepad),
-            "scratchpad" => Ok(BookCategory::Scratchpad),
+            JOURNAL => Ok(BookCategory::Journal),
+            NOTEPAD => Ok(BookCategory::Notepad),
+            SCRATCHPAD => Ok(BookCategory::Scratchpad),
             _ => Err(()),
         }
+    }
+}
+
+impl ToString for BookCategory {
+    fn to_string(&self) -> String {
+        let result = match *self {
+            BookCategory::Journal => JOURNAL,
+            BookCategory::Notepad => NOTEPAD,
+            BookCategory::Scratchpad => SCRATCHPAD,
+        };
+        result.to_string()
     }
 }
 
